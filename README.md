@@ -1,18 +1,13 @@
-<!--
-  Это шаблон. После создания своего репозитория:
-  1. Назовите репозиторий db-<фамилия>-<тема>, например db-ivanova-cinema.
-  2. Заполните разделы ниже под свою тему и удалите этот комментарий.
--->
+# Ветклиника
 
-# Название проекта
-
-Тема № __: **...**. Одно предложение: какие данные хранит база и кому они нужны.
+Тема № 20: 
+**База данных для хранения сведений о владельцах животных, питомцах, ветеринарных врачах, приёмах и процедурах**.
 
 | | |
 | --- | --- |
-| Главная таблица | ... |
-| Связь N:M | ... и ... через `...` |
-| Бизнес-правило | ... |
+| Главная таблица | pets - животные |
+| Связь N:M | Приемы и процедуры через `visit_procedures` |
+| Бизнес-правило | Прививка не раньше чем через год после прошлой |
 | СУБД | PostgreSQL 17 в Docker |
 
 ## Задания курса
@@ -42,23 +37,67 @@ dbcheck run demo/lab1.sql     # сценарий лабы 1
 
 ## ER-диаграмма
 
-<!-- Замените пример своими таблицами: 5+ таблиц, связь N:M через связующую таблицу. -->
-
 ```mermaid
 erDiagram
-    films ||--o{ sessions : "показывают"
-    halls ||--o{ sessions : "проходит в"
-    sessions ||--o{ tickets : "продано"
-    films ||--o{ film_genres : ""
-    genres ||--o{ film_genres : ""
+    owners ||--o{ pets : "владеет"
+    pets ||--o{ visits : "посещает"
+    doctors ||--o{ visits : "проводит"
+    visits ||--o{ visit_procedures : "включает"
+    procedures ||--o{ visit_procedures : "назначается"
 
-    films {
+    owners {
         int id PK
-        text title
+        text full_name
+        text phone UK
+        text email UK
+        text address
     }
-    film_genres {
-        int film_id PK, FK
-        int genre_id PK, FK
+
+    pets {
+        int id PK
+        int owner_id FK
+        text name
+        text species
+        text breed
+        date birth_date
+        text microchip_number UK
+        text notes
+    }
+
+    doctors {
+        int id PK
+        text full_name
+        text specialization
+        text phone UK
+        text email UK
+        int experience_years
+    }
+
+    visits {
+        int id PK
+        int pet_id FK
+        int doctor_id FK
+        timestamptz visit_date
+        text reason
+        text diagnosis
+        text notes
+    }
+
+    procedures {
+        int id PK
+        text name UK
+        text description
+        numeric price
+        int duration_minutes
+        boolean is_vaccination
+    }
+
+    visit_procedures {
+        int visit_id PK, FK
+        int procedure_id PK, FK
+        int quantity
+        numeric actual_price
+        text notes
     }
 ```
 
@@ -66,14 +105,25 @@ erDiagram
 
 | Ограничение | Таблица и колонки | Зачем |
 | --- | --- | --- |
-| `UNIQUE` | ... | ... |
-| `CHECK` | ... | ... |
+| `UNIQUE` | owners.phone | Исключает повторение телефонов владельцев |
+| `UNIQUE` | owners.email | Исключает повторение адресов электронной почты владельцев |
+| `UNIQUE` | pets.microchip_number | Исключает повторение номеров микрочипов |
+| `UNIQUE` | doctors.phone | Исключает повторение телефонов врачей |
+| `UNIQUE` | doctors.email | Исключает повторение адресов электронной почты врачей |
+| `UNIQUE` | procedures.name | Исключает повторение названий процедур |
+| `CHECK` | pets.birth_date | Дата рождения не может быть в будущем |
+| `CHECK` | doctors.experience_years | Стаж врача не может быть отрицательным |
+| `CHECK` | procedures.price | Стоимость процедуры не может быть отрицательной |
+| `CHECK` | procedures.duration_minutes | Продолжительность процедуры должна быть положительной |
+| `CHECK` | visits.reason | Причина обращения не может быть пустой |
+| `CHECK` | visit_procedures.quantity | Количество процедур должно быть положительным |
+| `CHECK` | visit_procedures.actual_price | Фактическая стоимость процедуры не может быть отрицательной |
 
 ## Что сделано по лабам
 
 | Лаба | Что сделано | Сценарий |
 | --- | --- | --- |
-| 1 | ... | `demo/lab1.sql` |
+| 1 | Созданы таблицы, первичные и внешние ключи, ограничения целостности и тестовые данные | `demo/lab1.sql` |
 | 2 | ... | `demo/lab2.sql` |
 | 3 | ... | `demo/lab3.sql` |
 | 4 | ... | `demo/lab4.sql`, `demo/race.sql`, `demo/race_fixed.sql` |
