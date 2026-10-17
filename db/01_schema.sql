@@ -36,6 +36,8 @@ CREATE TABLE visits (
     reason text NOT NULL,
     diagnosis text,
     notes text,
+    status text NOT NULL DEFAULT 'запланирован'
+        CHECK (status IN ('запланирован', 'завершён', 'отменён')),
     CHECK (length(trim(reason)) > 0)
 );
 

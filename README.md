@@ -81,6 +81,7 @@ erDiagram
         text reason
         text diagnosis
         text notes
+        text status
     }
 
     procedures {
@@ -112,6 +113,7 @@ erDiagram
 | `UNIQUE` | doctors.email | Исключает повторение адресов электронной почты врачей |
 | `UNIQUE` | procedures.name | Исключает повторение названий процедур |
 | `CHECK` | pets.birth_date | Дата рождения не может быть в будущем |
+| `CHECK` | visits.status | Допускаются только статусы «запланирован», «завершён» и «отменён» |
 | `CHECK` | doctors.experience_years | Стаж врача не может быть отрицательным |
 | `CHECK` | procedures.price | Стоимость процедуры не может быть отрицательной |
 | `CHECK` | procedures.duration_minutes | Продолжительность процедуры должна быть положительной |
